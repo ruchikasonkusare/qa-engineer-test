@@ -9,7 +9,7 @@ const JWT_SECRET = 'test-secret-key-do-not-use-in-production';
 // BUG C: Email validation is too permissive
 function validateEmail(email) {
   // BUG: This regex allows emails without TLD like "user@domain"
-  const emailRegex = /^[^\s@]+@[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
@@ -81,12 +81,16 @@ router.post('/login', async (req, res) => {
 
     // Find user
     const user = findUserByEmail(email);
+    console.log(user);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log(isValidPassword);
+    console.log(password);
+    console.log(user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

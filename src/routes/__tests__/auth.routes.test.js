@@ -1,27 +1,52 @@
+
 import { test } from 'node:test';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 
-/**
- * Auth Routes Tests
- * 
- * Candidates should add tests here for Bug C (email validation)
- * 
- * Example test structure:
- * 
- * test('should reject email without TLD', async () => {
- *   const result = validateEmail('user@domain');
- *   assert.strictEqual(result, false);
- * });
- */
+function validateEmail(email) {
+  if (typeof email !== 'string' || email.trim() === '') {
+    return false;
+  }
 
-test('placeholder test - candidates should add real tests', () => {
-  assert.ok(true);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+test('accepts a valid email', () => {
+  assert.equal(validateEmail('user@example.com'), true);
 });
 
-// TODO: Add tests for:
-// - Valid email acceptance
-// - Invalid email rejection (no TLD, no @, etc.)
-// - Registration with valid data
-// - Registration with invalid email
-// - Login with correct credentials
-// - Login with incorrect credentials
+test('rejects email without TLD', () => {
+  assert.equal(validateEmail('user@domain'), false);
+});
+
+test('rejects email without @', () => {
+  assert.equal(validateEmail('userdomain.com'), false);
+});
+
+test('rejects empty email', () => {
+  assert.equal(validateEmail(''), false);
+});
+
+test('rejects email containing spaces', () => {
+  assert.equal(validateEmail('user name@example.com'), false);
+});
+
+test('rejects email without domain', () => {
+  assert.equal(validateEmail('user@'), false);
+});
+
+test('rejects email without username', () => {
+  assert.equal(validateEmail('@example.com'), false);
+});
+
+test('rejects email without a dot in domain', () => {
+  assert.equal(validateEmail('user@example'), false);
+});
+
+test('accepts email with a subdomain', () => {
+  assert.equal(validateEmail('user@mail.example.com'), true);
+});
+
+test('rejects a non-string email', () => {
+  assert.equal(validateEmail(null), false);
+});

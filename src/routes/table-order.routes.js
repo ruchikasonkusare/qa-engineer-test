@@ -45,14 +45,33 @@ router.post('/', (req, res) => {
     // Should check if table already has a pending order
     // Missing validation below:
     
+    const existingOrder = (db.table_orders || []).find(
+      o => o.merchant_id === merchant_id && 
+           o.table_number === table_number && 
+           o.status === 'pending'
+    );
+    if (existingOrder) {
+      return res.status(409).json({ error: 'Table already has a pending order' });
+    }
+
+    // Prevent duplicate pending orders for the same merchant and table
     // const existingOrder = (db.table_orders || []).find(
-    //   o => o.merchant_id === merchant_id && 
-    //        o.table_number === table_number && 
-    //        o.status === 'pending'
+    //   o =>
+    //     o.merchant_id === merchant_id &&
+    //     o.table_number === table_number && 
+    //     o.status === 'pending'
     // );
+    // console.log(existingOrder)
+
     // if (existingOrder) {
-    //   return res.status(409).json({ error: 'Table already has a pending order' });
+    //   return res.status(409).json({
+    //     success: false,
+    //     error: 'Table already has a pending order',
+    //     existing_order_id: existingOrder.id
+    //   });
     // }
+
+
 
     // Calculate total
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);

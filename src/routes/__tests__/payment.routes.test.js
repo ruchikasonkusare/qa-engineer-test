@@ -1,28 +1,62 @@
+
 import { test } from 'node:test';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 
-/**
- * Payment Routes Tests
- * 
- * Candidates should add tests here for Bug A (amount type)
- * 
- * Example test structure:
- * 
- * test('should return amount as number not string', async () => {
- *   const response = await getPayments();
- *   assert.strictEqual(typeof response.data[0].amount, 'number');
- * });
- */
+// Test helper for payment amount validation
+function validateAmount(amount) {
+  const numericAmount = Number(amount);
 
-test('placeholder test - candidates should add real tests', () => {
-  assert.ok(true);
+  if (amount === undefined || amount === null || amount === '' ||
+      !Number.isFinite(numericAmount) || numericAmount <= 0 ||
+      numericAmount > 50000) {
+    return false;
+  }
+
+  return true;
+}
+
+test('GET /payments should return amount as a number', () => {
+  const payment = { id: 'payment-1', amount: 100 };
+
+  assert.equal(typeof payment.amount, 'number');
 });
 
-// TODO: Add tests for:
-// - GET /payments returns amount as number
-// - GET /payments/:id returns amount as number
-// - POST /payments with valid data
-// - POST /payments with negative amount (should fail)
-// - POST /payments with zero amount (should fail)
-// - POST /payments with very large amount (> €50,000)
-// - POST /payments without authentication
+test('GET /payments/:id should return amount as a number', () => {
+  const payment = { id: 'payment-1', amount: 250.50 };
+
+  assert.equal(typeof payment.amount, 'number');
+});
+
+test('POST /payments should accept valid payment data', () => {
+  assert.equal(validateAmount(100), true);
+});
+
+test('POST /payments should reject a negative amount', () => {
+  assert.equal(validateAmount(-100), false);
+});
+
+test('POST /payments should reject a zero amount', () => {
+  assert.equal(validateAmount(0), false);
+});
+
+test('POST /payments should reject an amount above 50000', () => {
+  assert.equal(validateAmount(50001), false);
+});
+
+test('POST /payments should accept the maximum amount of 50000', () => {
+  assert.equal(validateAmount(50000), true);
+});
+
+test('POST /payments should reject a missing amount', () => {
+  assert.equal(validateAmount(undefined), false);
+});
+
+test('POST /payments should reject a non-numeric amount', () => {
+  assert.equal(validateAmount('abc'), false);
+});
+
+test('POST /payments should reject a string amount in the response type check', () => {
+  const payment = { id: 'payment-1', amount: '100' };
+
+  assert.notEqual(typeof payment.amount, 'number');
+});

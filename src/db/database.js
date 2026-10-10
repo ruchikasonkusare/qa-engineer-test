@@ -1,6 +1,6 @@
 // Simple in-memory database for testing
 // In a real app, this would be PostgreSQL/MySQL
-
+import bcrypt from 'bcryptjs';
 export const db = {
   users: [],
   payments: [],
@@ -11,12 +11,14 @@ export const db = {
 };
 
 // Seed some test data
-export function initDatabase() {
+export async function initDatabase() {
   // Create a test merchant
+  const hashedPassword = await bcrypt.hash("Test123!", 10);
   db.users.push({
     id: "1",
     email: "merchant@test.com",
-    password: "$2a$10$8Z3KxGXvGqJQZ.ZF9Z3KxGXvGqJQZ.ZF9Z3KxGXvGqJQZ.ZF9", // password: Test123!
+    password:hashedPassword, 
+    // "$2a$10$8Z3KxGXvGqJQZ.ZF9Z3KxGXvGqJQZ.ZF9Z3KxGXvGqJQZ.ZF9", // password: Test123!
     business_name: "Test Merchant",
     type: "merchant",
     created_at: new Date(),

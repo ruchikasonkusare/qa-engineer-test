@@ -103,6 +103,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong!" });
 });
 
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf; 
+  }
+}));
+
 httpServer.listen(PORT, () => {
   console.log(`✅ EU Pay QA Test API running on http://localhost:${PORT}`);
   console.log(`📖 Visit http://localhost:${PORT} for available endpoints`);
